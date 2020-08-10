@@ -3,53 +3,90 @@ const bodyParser=require('body-parser')
 
 const leaderRouter=express.Router()
 leaderRouter.use(bodyParser.json())
+const Leaders=require('../models/leaders');
 
-
-leaderRouter.route('/:leaderId').all((req,res,next)=>
-{
-    res.statusCode=200;
-    res.setHeader('Content-Type','text/plain')
-    next()
-})
-.get((req,res,next)=>
-{
-    res.end("Will send"+req.params.leaderId)
-})
-.post((req,res,next)=>
-{
-    res.statusCode=403
-    res.end("Post operation not supported")
-})
-.put((req,res,next)=>
-{
-    res.end("Will add the leader " +req.body.name +'with details' +req.body.description)
-})
-.delete((req,res,next)=>{
-    res.end("Deleting the dishes "+req.params.leaderId)
-})
-
-leaderRouter.route('/').all((req,res,next)=>
-{
-    res.statusCode=200
-    res.setHeader('Constent-Type','text/plain')
-    next()
-})
+leaderRouter.route('/')
 .get((req,res,next)=>
 {   
-    res.end("Will send all leaders ")
+   Leaders.find({})
+    .then((leader)=>
+    {
+        res.statusCode=200;
+        res.setHeader("Content-Type",'application/json')
+        res.json(leader)
+    },(err)=>next(err)).catch((err)=>next(err));
 })
 .post((req,res,next)=>
 {
-    res.end("Will add the leader " +req.body.name+'with details' +req.body.description)
+    Leaders.create(req.body)
+    .then((leader)=>
+    {
+        console.log("Leader Created",leader)
+        res.statusCode=200;
+        res.setHeader("Content-Type",'application/json')
+        res.json(leader);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
 })
 .put((req,res,next)=>
 {
     res.statusCode=403
-    res.end("Put operation not supported")
+    res.end("Put operation not supported /leaders")
 })
 .delete((req,res,next)=>
 {
-    res.end("Deleting the leaders")
+    Leaders.remove({})
+    .then((resp)=>
+    {
+        res.statusCode=200;
+        res.setHeader("Content-Type",'application/json')
+        res.json(resp);
+ 
+    },(err)=>next(err))
+    .catch((err)=>next(err));
+});
+
+
+leaderRouter.route('/:leaderId')
+.get((req,res,next)=>
+{   
+  Leaders.findById(req.params.leaderId)
+  .then((leader)=>
+    {
+        console.log("Pro motio Created",leader)
+        res.statusCode=200;
+        res.setHeader("Content-Type",'application/json')
+        res.json(leader);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
+})
+.post((req,res,next)=>
+{
+    res.statusCode=403;
+    
+})
+.put((req,res,next)=>
+{
+  Leaders.findByIdAndUpdate(req.params.leaderId,{$set:req.body}
+    ,{new:true})
+  .then((leader) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(leader);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
+.delete((req,res,next)=>
+{
+    Leaders.findByIdAndRemove(req.params.leaderId)
+    .then((resp)=>
+   {
+       res.statusCode=200;
+       res.setHeader("Content-Type",'application/json')
+       res.json(resp);
+
+   },(err)=>next(err))
+   .catch((err)=>next(err));
 });
 
 module.exports=leaderRouter
