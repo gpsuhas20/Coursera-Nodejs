@@ -31,26 +31,15 @@ router.post('/signup',function(req,res,next)
     }
 
   });
+
+  //The passport.authenticate() method now returns the user object that was validated. 
+  //In addition, it attaches the req.session.passport property to the req.session object, 
+  //serializes the user via passport.serializeUser(), and attaches the serialized user 
+  //(i.e. the ID of the user) to the req.session.passport.user property. Finally, it attaches the full user object to req.user.
   
 });
 
-/*router.post('/signup', (req, res, next) => {
-  User.register(new User({username: req.body.username}), 
-    req.body.password, (err, user) => {
-    if(err) {
-      res.statusCode = 500;
-      res.setHeader('Content-Type', 'application/json');
-      res.json({err: err});
-    }
-    else {
-      passport.authenticate('local')(req, res, () => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({success: true, status: 'Registration Successful!'});
-      });
-    }
-  });
-});*/
+
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
   res.statusCode = 200;
