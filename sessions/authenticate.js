@@ -1,6 +1,6 @@
 
 
-var passport = require('passport');
+/*var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;// Local amazon fb,g+ 
 var User = require('./models/user');// we are applying the auth to the mongoose local fiels
 var JwtStrategy=require('passport-jwt').Strategy;// the way if auth
@@ -33,7 +33,7 @@ exports.getToken=function(user)
 var opts={};
 opts.jwtFromRequest=ExtractJwt.fromAuthHeaderAsBearerToken();
 // it tell how to extarct jwt from body of the req.
-opts.secretOrKey=config.secretKey;
+opts.secretOrKey=config.secretKey; // secret key present in the server side.
 
 exports.jwtPassport=passport.use(new JwtStrategy(opts,
     (jwt_payload,done)=>
@@ -55,6 +55,9 @@ exports.jwtPassport=passport.use(new JwtStrategy(opts,
         })
     }))
 exports.verifyUser=passport.authenticate('jwt',{session:false});
+// this verify user  function will authenticate the user whenever its called.
+
 //(strategy ,session)
 // verify function.
 // done is the callback through which we send the info which uses to load things on req message.
+*/

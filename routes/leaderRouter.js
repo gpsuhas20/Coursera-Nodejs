@@ -1,6 +1,6 @@
 const express=require('express')
 const bodyParser=require('body-parser')
-
+const authenticate=require('../authenticate')
 const leaderRouter=express.Router()
 leaderRouter.use(bodyParser.json())
 const Leaders=require('../models/leaders');
@@ -16,7 +16,7 @@ leaderRouter.route('/')
         res.json(leader)
     },(err)=>next(err)).catch((err)=>next(err));
 })
-.post((req,res,next)=>
+.post(authenticate.verifyUser,(req,res,next)=>
 {
     Leaders.create(req.body)
     .then((leader)=>
@@ -28,12 +28,12 @@ leaderRouter.route('/')
     },(err)=>next(err))
     .catch((err)=>next(err));
 })
-.put((req,res,next)=>
+.put(authenticate.verifyUser,(req,res,next)=>
 {
     res.statusCode=403
     res.end("Put operation not supported /leaders")
 })
-.delete((req,res,next)=>
+.delete(authenticate.verifyUser,(req,res,next)=>
 {
     Leaders.remove({})
     .then((resp)=>
@@ -60,12 +60,12 @@ leaderRouter.route('/:leaderId')
     },(err)=>next(err))
     .catch((err)=>next(err));
 })
-.post((req,res,next)=>
+.post(authenticate.verifyUser,(req,res,next)=>
 {
     res.statusCode=403;
     
 })
-.put((req,res,next)=>
+.put(authenticate.verifyUser,(req,res,next)=>
 {
   Leaders.findByIdAndUpdate(req.params.leaderId,{$set:req.body}
     ,{new:true})
@@ -76,7 +76,7 @@ leaderRouter.route('/:leaderId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete((req,res,next)=>
+.delete(authenticate.verifyUser,(req,res,next)=>
 {
     Leaders.findByIdAndRemove(req.params.leaderId)
     .then((resp)=>
