@@ -43,46 +43,28 @@ app.use(session({
   resave:false,
   store:new FileStore()
 }));
+
+app.use('/', indexRouter); // these endpoints can be accessed to the users without authentication.
+app.use('/users', usersRouter);
+
 function auth(req,res,next)
 {
   console.log(req.session);
-// authentication is done only when the user does not have a cookie.
-  if(!req.session.user)// means the user is not authenticated. he wont be having a cookie
-  {
-    var authHeader=req.headers.authorization;
-
-    if(!authHeader)
-    {
-      var err=new Error('You are not authenticated')
-      res.setHeader("WWW-Authenticate",'Basic');
-      err.status=401;
-      return next(err);
-    }
-    // auth contains an array of username and password.
-    var auth=new Buffer.from(authHeader.split(' ')[1],'base64').toString().split(':');// o contains base and 2nd username:password  againn split based on colon
-    var username=auth[0];
-    var password=auth[1];
+  if(!req.session.user)
+{
+    var err=new Error("You are no authenticated");
+    err.status=401;
+    return next(err);
   
-    if(username==='admin'&& password==="password")
-    {
-     req.session.user='admin';
-      next();
-    }
-    else{
-      var err=new Error('You are not authenticated')
-      res.setHeader("WWW-Authenticate",'Basic');
-      err.status=401;
-      return next(err)
-    }
-
-  }
+}
+ 
   else{
-    if(req.session.user==='admin'){
+    if(req.session.user==='authenticated'){
       next();
     }
     else{
       var err=new Error('You are not authenticated');
-      err.status=401;
+      err.status=403;// Forbidden,
       return next(err);
     }
   }
@@ -93,8 +75,7 @@ app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+
 app.use('/dishes',dishesRouter)
 app.use('/leaders',leaderRouter)
 app.use('/promotions',promoRouter)
