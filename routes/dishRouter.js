@@ -244,10 +244,24 @@ dishRouter.route('/:dishId/comments/:commentId')
 */
 
 
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(authenticate.verifyUser, (req, res, next) => { // comment id is passed as a route id.
     Dishes.findById(req.params.dishId).then((dish) => {
+        console.log(dish.comments[0]._id); // the comments are in a array.
+    // dish.comments will give array of objects has comment will have a object.
+        console.log(dish.comments.id(req.params.commentId)); // comments is a sub-schema so we can use .id and pass comment id to it to access the complete details of the comment. 
         if (dish != null && dish.comments.id(req.params.commentId)) {
-            if (dish.comments.id(req.params.commentId).author.toString() != req.user._id.toString()) {
+            if (dish.comments.id(req.params.commentId).author.toString() != req.user._id.toString()) {// here we are checking dish.comments.id(req.params.commentId) gives the 
+                /* 
+                { _id: 5f336f0705f1d61268c2b502,
+  rating: 1,
+  comment: 'updated comment',
+  author: 5f336c84aff7ee3a6cc232f7,
+  createdAt: 2020-08-12T04:24:39.662Z,
+  updatedAt: 2020-08-12T15:47:44.520Z }
+  and then .author.
+req.user._id will be added after adding to the login.
+                
+                */
                 err = new Error('You are not authorized to edit this comment');
                 err.status = 403;
                 return next(err);
