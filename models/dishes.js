@@ -15,9 +15,10 @@ var commentSchema = new Schema({
         type: String,
         required: true
     },
+    // we are referncing to the user model schema.
     author:  {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"User"
     }
 }, {
     timestamps: true

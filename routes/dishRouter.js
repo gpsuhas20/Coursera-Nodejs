@@ -12,6 +12,7 @@ dishRouter.use(bodyParser.json());
 dishRouter.route('/')
 .get((req,res,next) => {
    Dishes.find({})
+   .populate('comments.author')// for populating with the author field.
    .then((dishes) => {
        res.statusCode=200;
        res.setHeader('Content-Type' , 'application/json');
@@ -49,6 +50,7 @@ dishRouter.route('/')
 dishRouter.route('/:dishId')
 .get((req,res,next) => {
    Dishes.findById(req.params.dishId)
+   .populate('comments.author')
    .then((dish) => {
     res.statusCode=200;
     res.setHeader('Content-Type' , 'application/json');
@@ -88,6 +90,7 @@ dishRouter.route('/:dishId')
 dishRouter.route('/:dishId/comments')
 .get((req,res,next) => {
    Dishes.findById(req.params.dishId)
+   .populate('comments.author')
    .then((dish) => {
        if(dish!=null) {
             res.statusCode=200;
@@ -107,13 +110,20 @@ dishRouter.route('/:dishId/comments')
    Dishes.findById(req.params.dishId)
    .then((dish) => {
     if(dish!=null) {
-       
-        dish.comments.push(req.body);
+        // in the dishes schema we are getting the id of the author not the name so 
+        // name must be replaced before passing the value to the comments.
+       req.body.author=req.user._id;// updated by the authenticate verify user.so req.user wiil be loaded to req object.
+        dish.comments.push(req.body);// in form we are taking the name of the author but we are modifying to support our schema.
         dish.save()
         .then((dish) => {
-            res.statusCode=200;
-            res.setHeader('Content-Type' , 'application/json');
-            res.json(dish);
+            Dishes.findById(dish._id)
+            .populate('comments.author')// here we have stored only id by changing the req and so before sending the value to the client we have to replace the id of the user with the author.by referring to the user.js
+            .then((dish)=>
+            {
+                res.statusCode=200;
+                res.setHeader('Content-Type' , 'application/json');
+                res.json(dish);
+            }) 
         }, (err) => next(err));
     }
    else {
@@ -157,6 +167,7 @@ dishRouter.route('/:dishId/comments')
 dishRouter.route('/:dishId/comments/:commentId')
 .get((req,res,next) => {
     Dishes.findById(req.params.dishId)
+    .populate('comments.author')
     .then((dish) => {
         if (dish != null && dish.comments.id(req.params.commentId) != null) {
             res.statusCode = 200;
@@ -193,9 +204,15 @@ dishRouter.route('/:dishId/comments/:commentId')
             }
             dish.save()
             .then((dish) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(dish);                
+                Dishes.findById(dish._id)// to replace the user id with the comments.
+                .populate('comments.author')
+                .then((dish)=>
+                {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(dish);   
+                })
+                            
             }, (err) => next(err));
         }
         else if (dish == null) {
@@ -218,9 +235,14 @@ dishRouter.route('/:dishId/comments/:commentId')
             dish.comments.id(req.params.commentId).remove();
             dish.save()
             .then((dish) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(dish);                
+                Dishes.findById(dish._id)// to replace the user id with the comments.
+                .populate('comments.author')
+                .then((dish)=>
+                {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(dish);   
+                })             
             }, (err) => next(err));
         }
         else if (dish == null) {
