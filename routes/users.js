@@ -18,7 +18,7 @@ router.post('/signup',function(req,res,next)
   User.register(new User ({username:req.body.username}),req.body.password,(err,user)=>
   { // if the user is already registered u get an automatic error message.
     //only after successfully registering 
-    if(err)
+    if(err) 
     {
       res.statusCode=500;
       res.setHeader("Content-Type",'application/json');
