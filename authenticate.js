@@ -37,7 +37,7 @@ exports.jwtPassport = passport.use("user",new JwtStrategy(opts,
                     }
                 });
             }));
-            exports.jwtPassport = passport.use("admin",new JwtStrategy(opts, 
+          /*  exports.jwtPassport = passport.use("admin",new JwtStrategy(opts, 
                 (jwt_payload, done) => {
                     console.log("JWT payload: ", jwt_payload);
                     User.findOne({_id: jwt_payload._id}, (err, user) => {
@@ -51,7 +51,18 @@ exports.jwtPassport = passport.use("user",new JwtStrategy(opts,
                             return done(null, false);
                         }
                     });
-                }));
+                }));*/
 
 exports.verifyUser = passport.authenticate('user', {session: false});
-exports.verifyAdmin=passport.authenticate('admin',{session:false});
+exports.verifyAdmin=(req,res,next)=>
+{
+    if(req.user.admin)
+    {
+        next();
+    }
+    else{
+        var err= new Error("You are not authorised to perform this operation");
+        err.status=403;
+        next(err);
+    }
+}
