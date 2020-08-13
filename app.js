@@ -30,6 +30,17 @@ connect.then((db) => {
 
 
 var app = express();
+// if its a secure connection in the req object secure will be set to true.
+app.all('*',(req,res,next)=>
+{
+  if(req.secure)
+  {
+    return next();
+  }
+  else{
+    res.redirect(307,"https://"+req.hostname + ':'+app.get('secPort')+ req.url);
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
