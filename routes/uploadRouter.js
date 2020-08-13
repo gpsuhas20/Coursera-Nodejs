@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer=require('multer');
 const authenticate = require('../authenticate');
-
+const cors=require('./cors')
 const storage=multer.diskStorage(
     {
         destination:(req,file,cb)=>// file is the file uploaded.
@@ -42,21 +42,22 @@ uploadRouter.use(bodyParser.json());
 // only post 
 
 uploadRouter.route('/')//imageFile is the name of the form field on the client.
-.post(authenticate.verifyUser,authenticate.verifyAdmin,upload.single('imageFile'),(req,res)=>
+.options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,upload.single('imageFile'),(req,res)=>
 {
     res.statusCode=200;
     res.setHeader("Content-Type",'application/json');
     res.json(req.file);// url of the image where the image is stored this url can used in json file.
 })
-.get(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.get(cors.cors,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     res.statusCode = 403;
     res.end('GET operation not supported on /imageUpload');
 })
-.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /imageUpload');
 })
-.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next) => {
     res.statusCode = 403;
     res.end('DELETE operation not supported on /imageUpload');
 })
