@@ -70,13 +70,13 @@ router.get('/logout', cors.corsWithOptions, (req, res) => {
   }
 });
 
-/*router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
+router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
   if (req.user) {//user information will be loaded from authenticate.js by this time
-    var token = authenticate.getToken({_id: req.user._id});//generates token to pass it on to client appln
+    var token = authenticate.getToken({_id: req.user._id});//generates token to pass it on to client appln for every auth we have to add this.
+    // the use of fb token is required upto here
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json({success: true, token: token, status: 'You are successfully logged in!'});
   }
-});*/
-
+});
 module.exports = router;
